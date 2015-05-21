@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Predicting Miles Per Gallon</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Predicting Miles Per Gallon">
+  <meta name="author" content="Tanveer Ansari">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>Predicting Miles Per Gallon</h1>
+    <h2></h2>
+    <p>Tanveer Ansari<br/></p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Predicting Gas Mileage of Cars</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Use the mtcars dataset in R {base} package</li>
+<li>Fit a linear model to explain variation in mpg</li>
+<li>Use the model for predictions</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-2" style="background:;">
+  <hgroup>
+    <h2>Model and variables used</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>Let us fit a linear regression model to the mtcars dataset in package base  </p>
+
+<p>I used wt, hp, qsec and disp variables for predicting mpg.</p>
+
+<table><thead>
+<tr>
+<th>Abbreviation</th>
+<th>Explanation</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>mpg</td>
+<td>Miles/(US) gallon</td>
+</tr>
+<tr>
+<td>wt</td>
+<td>Weight in thousands of lbs</td>
+</tr>
+<tr>
+<td>hp</td>
+<td>Gross Horsepower</td>
+</tr>
+<tr>
+<td>qsec</td>
+<td>Time taken to travel a quarter mile</td>
+</tr>
+<tr>
+<td>disp</td>
+<td>Engine Displacement in cubic inches</td>
+</tr>
+</tbody></table>
+
+<p>Variable selection builds upon my <a href="https://s3.amazonaws.com/coursera-uploads/user-643a38d96a27064318cb87b3/973532/asst-4/c32a7db0eb8f11e497299d1b8b45aece.pdf">Regression Models Course Project</a></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-3" style="background:;">
+  <hgroup>
+    <h2>R code</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">library(dplyr); 
+cars&lt;-select(mtcars, mpg,disp,hp,wt,qsec)
+fit&lt;-lm(mpg~disp+hp+wt+qsec, data=cars)
+#summary(fit)$coefficients
+</code></pre>
+
+<p>Use the mean column values of cars to create a prediction input x</p>
+
+<pre><code class="r">x&lt;-as.data.frame(t(colMeans(cars)))
+x$mpg&lt;-NULL
+x$mpg &lt;- predict(fit, newdata = x)
+x
+</code></pre>
+
+<pre><code>##       disp       hp      wt     qsec      mpg
+## 1 230.7219 146.6875 3.21725 17.84875 20.09062
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-4" style="background:;">
+  <hgroup>
+    <h2>Shiny Application</h2>
+  </hgroup>
+  <article data-timings="">
+    <p>The shiny application takes hp and wt values from user input and uses them to predict mpg  </p>
+
+<pre><code class="r"># server.R
+
+shinyServer(function(input, output) {
+  mpgPrediction&lt;-reactive({
+    # Use hp and wt from user&#39;s slider values
+    x$hp&lt;-input$hp
+    x$wt&lt;-input$wt
+    #Predict mpg
+    x$mpg&lt;-predict(fit, newdata=x)
+    return(x$mpg)
+    })
+
+  # Set the value of output element &quot;mpg&quot;&quot; to predicted mpg
+  output$mpg&lt;-renderPrint(mpgPrediction())
+  })
+</code></pre>
+
+<p>It then displays the calculated mpg on ui.R</p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="" id="slide-5" style="background:;">
+  <article data-timings="">
+    
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Predicting Gas Mileage of Cars'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Model and variables used'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='R code'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Shiny Application'>
+         4
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=5 title=''>
+         5
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>
